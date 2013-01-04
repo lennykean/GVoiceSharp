@@ -16,9 +16,14 @@ namespace GVoiceSharp
         private const string RNR_SE_FIELD = "_rnr_se";
         private const string PHONENUMBER_FIELD = "phoneNumber";
         private const string TEXT_FIELD = "text";
+        private const string OUTGOINGNUMBER_FIELD = "outgoingNumber";
+        private const string FORWARDINGNUMBER_FIELD = "forwardingNumber";
+        private const string SUBSCRIBERNUMBER_FIELD = "subscriberNumber";
+        private const string PHONETYPE_FIELD = "phoneType";
 
         private static readonly Uri LoginUri = new Uri("https://www.google.com/voice/");
         private static readonly Uri SendSmsUri = new Uri("https://www.google.com/voice/sms/send/");
+        private static readonly Uri ConnectCallUri = new Uri("https://www.google.com/voice/call/connect/");
 
         private readonly IWebManager _webManager;
         private bool _isLoggedIn;
@@ -88,6 +93,41 @@ namespace GVoiceSharp
                 new FormField(RNR_SE_FIELD, _rnrSe)
             };
             var response = _webManager.PerformPost(SendSmsUri, formData, FormFieldSerializationType.UrlEncoded);
+
+            using (var streamReader = new StreamReader(response.Response))
+            {
+                var result = JsonConvert.DeserializeObject<Result>(streamReader.ReadToEnd());
+
+                if (!result.Ok)
+                    throw new GVoiceException(result.Data.Code);
+            }
+        }
+
+        /// <summary>
+        /// Call a phone number using a forwarding phone number
+        /// </summary>
+        /// <param name="outgoingNumber">Phone number to call</param>
+        /// <param name="forwardingNumber">Forwarding number to call</param>
+        /// <param name="phoneType">Phone Type Enumerator</param>
+        /// <param name="remember">Flag to remember the forwarding phone choice</param>
+        /// <param name="subscriberNumber">unknown, passed as "UNDEFINED"</param>
+        public void ConnectCall(string outgoingNumber, string forwardingNumber, string subscriberNumber, string phoneType, string remember)
+        {
+            if (!_isLoggedIn)
+                throw new InvalidOperationException("Not logged in");
+            if (_isDisposed)
+                throw new ObjectDisposedException(GetType().Name);
+
+            var formData = new FormFieldCollection
+            {
+                new FormField(OUTGOINGNUMBER_FIELD, outgoingNumber),
+                new FormField(FORWARDINGNUMBER_FIELD, forwardingNumber),
+                new FormField(SUBSCRIBERNUMBER_FIELD,subscriberNumber),
+                new FormField(PHONETYPE_FIELD,phoneType),
+                new FormField("remember",remember),
+                new FormField(RNR_SE_FIELD, _rnrSe)
+            };
+            var response = _webManager.PerformPost(ConnectCallUri, formData, FormFieldSerializationType.UrlEncoded);
 
             using (var streamReader = new StreamReader(response.Response))
             {
