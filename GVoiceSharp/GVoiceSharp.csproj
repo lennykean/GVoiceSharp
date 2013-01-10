@@ -46,6 +46,7 @@
     <Compile Include="GVoiceConnection.cs" />
     <Compile Include="GVoiceConnectionFactory.cs" />
     <Compile Include="IGVoiceConnection.cs" />
+    <Compile Include="PhoneTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GVoiceException.cs" />
     <Compile Include="Web\Form.cs" />
