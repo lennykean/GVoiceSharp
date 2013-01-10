@@ -25,9 +25,8 @@ namespace GVoiceSharp
         /// <param name="outgoingNumber">Phone number to call</param>
         /// <param name="forwardingNumber">Forwarding number to call</param>
         /// <param name="phoneType">Phone Type Enumerator</param>
-        /// <param name="remember">Flag to remember the forwarding phone choice</param>
-        /// <param name="subscriberNumber">unknown, passed as "UNDEFINED"</param>
-        void ConnectCall(string outgoingNumber, string forwardingNumber, string subscriberNumber, string phoneType, string remember);
+        /// <param name="subscriberNumber">unknown, passed as "undefined"</param>
+        void ConnectCall(string outgoingNumber, string forwardingNumber, PHONETYPES phoneType);
         /// <summary>
         /// Close the connection
         /// </summary>

@@ -20,7 +20,8 @@ namespace GVoiceSharp
         private const string FORWARDINGNUMBER_FIELD = "forwardingNumber";
         private const string SUBSCRIBERNUMBER_FIELD = "subscriberNumber";
         private const string PHONETYPE_FIELD = "phoneType";
-
+        private const string REMEMBER_FIELD = "remember";
+        
         private static readonly Uri LoginUri = new Uri("https://www.google.com/voice/");
         private static readonly Uri SendSmsUri = new Uri("https://www.google.com/voice/sms/send/");
         private static readonly Uri ConnectCallUri = new Uri("https://www.google.com/voice/call/connect/");
@@ -52,8 +53,8 @@ namespace GVoiceSharp
             var loginPageResponse = _webManager.RequestPage(LoginUri);
             var loginForms = formParser.ParseForms(loginPageResponse.Response);
 
-            if (loginForms.Count > 1 || 
-                !loginForms[0].Fields.ContainsField(EMAIL_FIELD) || 
+            if (loginForms.Count > 1 ||
+                !loginForms[0].Fields.ContainsField(EMAIL_FIELD) ||
                 !loginForms[0].Fields.ContainsField(PASSWORD_FIELD))
             {
                 throw new Exception("Error logging in, expected token not found.");
@@ -109,9 +110,7 @@ namespace GVoiceSharp
         /// <param name="outgoingNumber">Phone number to call</param>
         /// <param name="forwardingNumber">Forwarding number to call</param>
         /// <param name="phoneType">Phone Type Enumerator</param>
-        /// <param name="remember">Flag to remember the forwarding phone choice</param>
-        /// <param name="subscriberNumber">unknown, passed as "UNDEFINED"</param>
-        public void ConnectCall(string outgoingNumber, string forwardingNumber, string subscriberNumber, string phoneType, string remember)
+        public void ConnectCall(string outgoingNumber, string forwardingNumber,  PHONETYPES phoneType)
         {
             if (!_isLoggedIn)
                 throw new InvalidOperationException("Not logged in");
@@ -122,9 +121,7 @@ namespace GVoiceSharp
             {
                 new FormField(OUTGOINGNUMBER_FIELD, outgoingNumber),
                 new FormField(FORWARDINGNUMBER_FIELD, forwardingNumber),
-                new FormField(SUBSCRIBERNUMBER_FIELD,subscriberNumber),
-                new FormField(PHONETYPE_FIELD,phoneType),
-                new FormField("remember",remember),
+                new FormField(PHONETYPE_FIELD,((int)phoneType).ToString()),
                 new FormField(RNR_SE_FIELD, _rnrSe)
             };
             var response = _webManager.PerformPost(ConnectCallUri, formData, FormFieldSerializationType.UrlEncoded);
